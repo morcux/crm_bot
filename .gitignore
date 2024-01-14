@@ -4,3 +4,4 @@ tets.py
 **/__pycache__
 *.pyc
 
+database.db

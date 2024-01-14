@@ -8,8 +8,8 @@ class DataProcessor:
         self.token = Config().get_api_token()
         self.base_url = "https://fbtool.pro/api"
 
-    def get_response(self):
-        url = f"{self.base_url}/get-statistics?key={self.token}&account=17233976&mode=adsets"
+    def get_response(self, acc_id: int):
+        url = f"{self.base_url}/get-statistics?key={self.token}&account={acc_id}&mode=adsets"
         response = requests.get(url)
         print(response.text)
         return response
@@ -23,3 +23,10 @@ class DataProcessor:
                     if adset.get("name") == target_name:
                         return adset.get("insights", {}).get("data", [{}])[0].get("spend")
         return None
+
+    def get_all_accounts(self):
+        url = f"{self.base_url}/get-accounts?key={self.token}&account=17233976"
+        response = requests.get(url)
+        data = response.json()
+        ids = [item['id'] for item in data.values() if isinstance(item, dict) and 'id' in item]
+        return ids
