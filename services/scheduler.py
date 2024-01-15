@@ -9,17 +9,28 @@ async def main():
     data_processor = DataProcessor()
     accounts = data_processor.get_all_accounts()
     max_row_number = editor.get_last_row()
-    for row_number in range(2, max_row_number + 1):
+    for row_number in range(1, max_row_number + 1):
         name = editor.get_data_by_cell(f"B{row_number}")[0][0]
-        for account in accounts:
-            response = data_processor.get_response(acc_id=account)
+        acc = editor.get_data_by_cell(f"K{row_number}")[0][0]
+        if acc:
+            response = data_processor.get_response(acc_id=acc)
             spend = data_processor.get_spend_by_name(target_name=name,
                                                      response=response)
+            if spend:
+                editor.update_data("F", row_number, spend)
+                continue
+            else:
+                pass
+        for account in accounts:
+            response = data_processor.get_response(acc_id=account)
+
             if spend is None:
                 continue
             else:
+                editor.update_data(colm="K",
+                                   number=row_number,
+                                   value=[account])
                 break
-        print(spend)
         editor.update_data("F", row_number, spend)
 
 
