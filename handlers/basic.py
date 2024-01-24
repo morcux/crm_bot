@@ -38,21 +38,3 @@ async def on_chat_member_join(chat_member: ChatMemberUpdated):
     if is_sub:
         editor.update_mambers_count(link=is_sub, number=-1)
         return await db.delete_user_by_id(user_id=user_id)
-
-
-@basic_router.message(F.text == "test")
-async def test(message: Message):
-    print(123)
-    db = AsyncDatabaseHandler()
-    editor = GoogleSheetEditor()
-    invite_link = None
-    if invite_link:
-        await db.add_user(url=invite_link,
-                          user_id=message.from_user.id)
-        return editor.update_mambers_count(link=invite_link,
-                                           number=1)
-    print(312)
-    is_sub = await db.check_user_by_id(user_id=message.from_user.id)
-    if is_sub:
-        editor.update_mambers_count(link=is_sub, number=-1)
-        return await db.delete_user_by_id(user_id=message.from_user.id)

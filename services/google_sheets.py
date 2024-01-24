@@ -6,13 +6,13 @@ from config import Config
 
 
 client = gspread.service_account(filename=Config().get_client_secret_path())
-sh = client.open_by_key("1c63VemrYWl1ZLgkO5tpo0860qfKRxdTKMmoP3B7S8CU")
+sh = client.open_by_key("1yOfCoMLYIz-3Up2u5xMwuE01Qs8xdkEJ0iQJvwpFRH0")
 
 
 class GoogleSheetEditor():
 
     def create_new_sheet(self, name: str):
-        ws = sh.add_worksheet(title=name, rows=100, cols=100)
+        ws = sh.add_worksheet(title=name, rows=10000, cols=100)
         return ws
 
     def get_worksheet(self):
@@ -53,7 +53,7 @@ class GoogleSheetEditor():
                 range_name=f"A{start_row}",
                 values=[
                     [start_row,
-                     f"{names[i]}", "", "", "", "", 0, "", links[i], users[i]]
+                     names[i], "", "", "", "", 0, 0, links[i], users[i]]
                        ])
             start_row += 1
 
@@ -64,10 +64,11 @@ class GoogleSheetEditor():
 
     def update_mambers_count(self, link: str, number: int):
         cell = self.find_by_data(data=link)
-        current = self.get_data_by_cell(cell=f"G{cell.row}")
-        if current:
-            self.update_data(colm="G", number=cell.row,
-                             value=int(current[0][0])+number)
+        if cell:
+            current = self.get_data_by_cell(cell=f"G{cell.row}")
+            if current:
+                self.update_data(colm="G", number=cell.row,
+                                value=int(current[0][0])+number)
 
     def get_all_sheet_data(self):
         wks = self.get_worksheet()

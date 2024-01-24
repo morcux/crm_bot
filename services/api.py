@@ -1,3 +1,4 @@
+import json
 import requests
 from requests import Response
 from config import Config
@@ -15,13 +16,19 @@ class DataProcessor:
         return response
 
     def get_spend_by_name(self, target_name: str, response: Response):
-        if response.status_code == 200:
-            data = response.json()
-
-            for account in data.get("data", []):
-                for adset in account.get("adsets", {}).get("data", []):
-                    if adset.get("name") == target_name:
-                        return adset.get("insights", {}).get("data", [{}])[0].get("spend")
+        if response.json():
+            total_spend = 0
+            for account in response.json()["data"]:
+                
+                adsets_data = account.get("adsets", {}).get("data", [])
+                for adset in adsets_data:
+                    if adset.get("campaign", {}).get("name") == target_name:
+                        insights = adset.get("insights", [])
+                        if insights:
+                            print(insights["data"][0]["spend"])
+                            total_spend += float(insights["data"][0]["spend"])
+            print(total_spend)
+            return total_spend
         return None
 
     def get_all_accounts(self):

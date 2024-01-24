@@ -10,8 +10,12 @@ async def main():
     accounts = data_processor.get_all_accounts()
     max_row_number = editor.get_last_row()
     for row_number in range(1, max_row_number + 1):
+        print(row_number)
         name = editor.get_data_by_cell(f"B{row_number}")[0][0]
-        acc = editor.get_data_by_cell(f"K{row_number}")[0][0]
+        try:
+            acc = editor.get_data_by_cell(f"K{row_number}")[0][0]
+        except IndexError:
+            acc = None
         if acc:
             response = data_processor.get_response(acc_id=acc)
             spend = data_processor.get_spend_by_name(target_name=name,
@@ -19,19 +23,20 @@ async def main():
             if spend:
                 editor.update_data("F", row_number, spend)
                 continue
-            else:
-                pass
-        for account in accounts:
-            response = data_processor.get_response(acc_id=account)
-
-            if spend is None:
-                continue
-            else:
-                editor.update_data(colm="K",
-                                   number=row_number,
-                                   value=[account])
-                break
-        editor.update_data("F", row_number, spend)
+        else:
+            for account in accounts:
+                response = data_processor.get_response(acc_id=account)
+                spend = data_processor.get_spend_by_name(target_name=name,
+                                                        response=response)
+                if spend is None:
+                    continue
+                else:
+                    editor.update_data(colm="K",
+                                    number=row_number,
+                                    value=account)
+                    editor.update_data("F", row_number, spend)
+                    
+                    break
 
 
 def links_migration():
@@ -46,7 +51,8 @@ def links_migration():
 
 
 async def start_sheduler():
+    # await main()
     scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
-    scheduler.add_job(main, 'interval', minutes=1)
-    scheduler.add_job(links_migration, "cron", hour=20, minute=34)
+    scheduler.add_job(main, 'interval', minutes=30)
+    scheduler.add_job(links_migration, "cron", hour=23, minute=59)
     scheduler.start()
