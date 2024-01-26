@@ -5,3 +5,4 @@ tets.py
 *.pyc
 
 database.db
+services/client_secret.json

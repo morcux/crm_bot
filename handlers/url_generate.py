@@ -32,11 +32,10 @@ async def add_data(message: Message, state: FSMContext, bot: Bot):
     names = data["names"]
     users = message.text.split("\n")
     for i in range(len(names)):
-        print(i)
         link = await bot.create_chat_invite_link(chat_id=data["channel"],
                                                  name=f"{names[i]}",
                                                  creates_join_request=True)
         links.append(link.invite_link)
-    editor.add_links(links=links, names=names, users=users)
+    await editor.add_links(links=links, names=names, users=users)
     await message.answer(text="\n".join(links))
     await state.clear()

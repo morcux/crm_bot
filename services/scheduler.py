@@ -7,39 +7,34 @@ from services.google_sheets import GoogleSheetEditor
 async def main():
     editor = GoogleSheetEditor()
     data_processor = DataProcessor()
-    accounts = data_processor.get_all_accounts()
-    max_row_number = editor.get_last_row()
-    for row_number in range(1, max_row_number + 1):
-        print(row_number)
-        name = editor.get_data_by_cell(f"B{row_number}")[0][0]
-        try:
-            acc = editor.get_data_by_cell(f"K{row_number}")[0][0]
-        except IndexError:
-            acc = None
-        if acc:
-            response = data_processor.get_response(acc_id=acc)
-            spend = data_processor.get_spend_by_name(target_name=name,
-                                                     response=response)
-            if spend:
-                editor.update_data("F", row_number, spend)
-                continue
-        else:
-            for account in accounts:
-                response = data_processor.get_response(acc_id=account)
-                spend = data_processor.get_spend_by_name(target_name=name,
+    accounts = await data_processor.get_all_accounts()
+    data = editor.get_all_sheet_data()
+    rows = [[row[0], row[1], row[-3], row[-1]] if len(row) == 11 else [row[0], row[1], row[-3], ""] for row in data]
+    print(rows)
+    for row in rows:
+        print(row[1])
+        print(row[-1])
+        if row[-1] != "":
+            response = await data_processor.get_response(acc_id=row[-1])
+            spend = await data_processor.get_spend_by_name(target_name=row[1],
                                                         response=response)
-                if spend is None:
-                    continue
-                else:
-                    editor.update_data(colm="K",
-                                    number=row_number,
-                                    value=account)
-                    editor.update_data("F", row_number, spend)
-                    
-                    break
-
-
-def links_migration():
+            editor.update_data("F", row[0], spend)
+            continue
+        for account in accounts:
+            print(account)
+            response = await data_processor.get_response(acc_id=account)
+            spend = await data_processor.get_spend_by_name(target_name=row[1],
+                                                           response=response)
+            if spend is None:
+                continue
+            editor.update_data(colm="K", number=row[0], value=account)
+            editor.update_data("F", row[0], spend)
+            break
+        if spend is None:
+            editor.update_data("F", row[0], "Не найдено")
+            
+    
+async def links_migration():
     editor = GoogleSheetEditor()
     data = editor.get_all_sheet_data()
 
@@ -52,6 +47,7 @@ def links_migration():
 
 async def start_sheduler():
     # await main()
+    # await links_migration()S
     scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
     scheduler.add_job(main, 'interval', minutes=30)
     scheduler.add_job(links_migration, "cron", hour=23, minute=59)

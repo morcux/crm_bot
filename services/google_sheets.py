@@ -6,13 +6,13 @@ from config import Config
 
 
 client = gspread.service_account(filename=Config().get_client_secret_path())
-sh = client.open_by_key("1yOfCoMLYIz-3Up2u5xMwuE01Qs8xdkEJ0iQJvwpFRH0")
+sh = client.open_by_key("1c63VemrYWl1ZLgkO5tpo0860qfKRxdTKMmoP3B7S8CU")
 
 
 class GoogleSheetEditor():
 
     def create_new_sheet(self, name: str):
-        ws = sh.add_worksheet(title=name, rows=10000, cols=100)
+        ws = sh.add_worksheet(title=name, rows=10000, cols=100, index=0)
         return ws
 
     def get_worksheet(self):
@@ -59,7 +59,7 @@ class GoogleSheetEditor():
 
     def get_data_by_cell(self, cell: str):
         wks = self.get_worksheet()
-        print(wks.get(cell))
+        # print(wks.get(cell))
         return wks.get(cell)
 
     def update_mambers_count(self, link: str, number: int):

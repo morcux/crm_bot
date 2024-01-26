@@ -24,7 +24,6 @@ async def generate(message:  Message, bot: Bot):
 
 @basic_router.chat_member()
 async def on_chat_member_join(chat_member: ChatMemberUpdated):
-    print(chat_member.new_chat_member.user.id)
     user_id = chat_member.new_chat_member.user.id
     db = AsyncDatabaseHandler()
     editor = GoogleSheetEditor()
@@ -36,5 +35,5 @@ async def on_chat_member_join(chat_member: ChatMemberUpdated):
                                            number=1)
     is_sub = await db.check_user_by_id(user_id=user_id)
     if is_sub:
-        editor.update_mambers_count(link=is_sub, number=-1)
+        await editor.update_mambers_count(link=is_sub, number=-1)
         return await db.delete_user_by_id(user_id=user_id)
