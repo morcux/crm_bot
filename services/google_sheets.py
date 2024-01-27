@@ -6,7 +6,7 @@ from config import Config
 
 
 client = gspread.service_account(filename=Config().get_client_secret_path())
-sh = client.open_by_key("1c63VemrYWl1ZLgkO5tpo0860qfKRxdTKMmoP3B7S8CU")
+sh = client.open_by_key("1yOfCoMLYIz-3Up2u5xMwuE01Qs8xdkEJ0iQJvwpFRH0")
 
 
 class GoogleSheetEditor():

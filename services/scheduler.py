@@ -10,10 +10,8 @@ async def main():
     accounts = await data_processor.get_all_accounts()
     data = editor.get_all_sheet_data()
     rows = [[row[0], row[1], row[-3], row[-1]] if len(row) == 11 else [row[0], row[1], row[-3], ""] for row in data]
-    print(rows)
     for row in rows:
-        print(row[1])
-        print(row[-1])
+
         if row[-1] != "":
             response = await data_processor.get_response(acc_id=row[-1])
             spend = await data_processor.get_spend_by_name(target_name=row[1],

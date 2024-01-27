@@ -19,7 +19,7 @@ class DataProcessor:
                     data = json.loads(await response.text())
                 except json.decoder.JSONDecodeError:
                     asyncio.sleep(10)
-                    await self.get_response(acc_id=acc_id)
+                    return await self.get_response(acc_id=acc_id)
                 return 
 
     async def get_spend_by_name(self, target_name: str, response) -> float:
