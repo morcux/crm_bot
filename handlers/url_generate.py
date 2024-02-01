@@ -18,24 +18,16 @@ async def get_names(call: CallbackQuery, state: FSMContext):
 
 
 @url_router.message(StateFilter(ChannelStates.get_names))
-async def get_user(message: Message, state: FSMContext):
-    await state.update_data({"names": message.text.split("\n")})
-    await state.set_state(ChannelStates.get_user)
-    await message.answer(text="Введите имена сотрудников")
-
-
-@url_router.message(StateFilter(ChannelStates.get_user))
 async def add_data(message: Message, state: FSMContext, bot: Bot):
     data = await state.get_data()
     editor = GoogleSheetEditor()
     links = []
-    names = data["names"]
-    users = message.text.split("\n")
+    names = message.text.split("\n")
     for i in range(len(names)):
         link = await bot.create_chat_invite_link(chat_id=data["channel"],
                                                  name=f"{names[i]}",
                                                  creates_join_request=True)
         links.append(link.invite_link)
-    await editor.add_links(links=links, names=names, users=users)
+    editor.add_links(links=links, names=names)
     await message.answer(text="\n".join(links))
     await state.clear()

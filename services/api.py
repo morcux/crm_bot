@@ -27,6 +27,7 @@ class DataProcessor:
         data = response
         
         for account in data.get("data", []):
+            currency = account.get("currency")
             adsets_data = account.get("adsets", {}).get("data", [])
             for adset in adsets_data:
                 if re.sub(r'(\\u[0-9a-fA-F]{4})', lambda x: bytes(x.group(1), 'utf-8').decode('unicode_escape'),
@@ -34,8 +35,9 @@ class DataProcessor:
                     
                     insights = adset.get("insights", [])
                     if insights:
-                        print(insights["data"][0]["spend"])
-                        total_spend += float(insights["data"][0]["spend"])
+                        if currency == "RUB":
+                            insights["data"][0]["spend"]
+                        total_spend += float()
         if total_spend > 0.0:
             return total_spend
         return None

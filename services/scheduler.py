@@ -19,7 +19,6 @@ async def main():
             editor.update_data("F", row[0], spend)
             continue
         for account in accounts:
-            print(account)
             response = await data_processor.get_response(acc_id=account)
             spend = await data_processor.get_spend_by_name(target_name=row[1],
                                                            response=response)

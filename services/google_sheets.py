@@ -12,7 +12,7 @@ sh = client.open_by_key("1yOfCoMLYIz-3Up2u5xMwuE01Qs8xdkEJ0iQJvwpFRH0")
 class GoogleSheetEditor():
 
     def create_new_sheet(self, name: str):
-        ws = sh.add_worksheet(title=name, rows=10000, cols=100, index=0)
+        ws = sh.add_worksheet(title=name, rows=1000, cols=100, index=0)
         return ws
 
     def get_worksheet(self):
@@ -24,10 +24,13 @@ class GoogleSheetEditor():
             except gspread.exceptions.APIError:
                 current = 0
                 while True:
-                    ws = sh.get_worksheet(current)
-                    if ws.title == date:
-                        return ws
-                    current += 1
+                    try:
+                        ws = sh.get_worksheet(current)
+                        if ws.title == date:
+                            return ws
+                        current += 1
+                    except gspread.exceptions.WorksheetNotFound:
+                        return self.create_new_sheet(name=date)
         return ws
 
     def get_last_row(self):
@@ -45,7 +48,7 @@ class GoogleSheetEditor():
         wks = self.get_worksheet()
         return wks.find(query=data)
 
-    def add_links(self, links: List[str], names: List[str], users: List[str]):
+    def add_links(self, links: List[str], names: List[str]):
         wks = self.get_worksheet()
         start_row = self.get_last_row() + 1
         for i in range(len(links)):
@@ -53,7 +56,7 @@ class GoogleSheetEditor():
                 range_name=f"A{start_row}",
                 values=[
                     [start_row,
-                     names[i], "", "", "", "", 0, 0, links[i], users[i]]
+                     names[i], "", "", "", "", 0, 0, links[i]]
                        ])
             start_row += 1
 
