@@ -1,4 +1,5 @@
 import re
+from bs4 import BeautifulSoup
 import json
 import aiohttp
 import asyncio
@@ -11,21 +12,30 @@ class DataProcessor:
         self.token = Config().get_api_token()
         self.base_url = "https://fbtool.pro/api"
 
-    async def get_response(self, acc_id: int) -> ClientResponse:
+    async def convert(spend: float, currency: str):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url=f"https://www.forbes.com/advisor/money-transfer/currency-converter/{currency.lower()}-usd/?amount={spend}") as response:
+                soup = BeautifulSoup(response.text, "html.parser")
+                return soup.find("span", class_="amount")
+
+    async def get_response(self, acc_id: int, retries: int = 3) -> ClientResponse:
         url = f"{self.base_url}/get-statistics?key={self.token}&account={acc_id}&mode=adsets"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 try:
                     data = json.loads(await response.text())
                 except json.decoder.JSONDecodeError:
-                    asyncio.sleep(10)
-                    return await self.get_response(acc_id=acc_id)
-                return 
+                    if retries > 0:
+                        await asyncio.sleep(10)
+                        return await self.get_response(acc_id=acc_id, retries=retries-1)
+                    else:
+                        raise
+                return data
 
     async def get_spend_by_name(self, target_name: str, response) -> float:
         total_spend = 0
         data = response
-        
+        print(data)
         for account in data.get("data", []):
             currency = account.get("currency")
             adsets_data = account.get("adsets", {}).get("data", [])
@@ -35,9 +45,11 @@ class DataProcessor:
                     
                     insights = adset.get("insights", [])
                     if insights:
-                        if currency == "RUB":
-                            insights["data"][0]["spend"]
-                        total_spend += float()
+                        spend = insights["data"][0]["spend"]
+                        if currency != "USD":
+                            spend = await self.convert(spend, currency)
+                            
+                        total_spend += float(spend)
         if total_spend > 0.0:
             return total_spend
         return None

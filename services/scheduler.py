@@ -43,7 +43,7 @@ async def links_migration():
 
 
 async def start_sheduler():
-    # await main()
+    await main()
     # await links_migration()S
     scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
     scheduler.add_job(main, 'interval', minutes=30)
