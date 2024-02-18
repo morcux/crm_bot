@@ -11,7 +11,8 @@ async def main():
     data = editor.get_all_sheet_data()
     rows = [[row[0], row[1], row[-3], row[-1]] if len(row) == 11 else [row[0], row[1], row[-3], ""] for row in data]
     for row in rows:
-
+        if row[1] == "":
+            continue
         if row[-1] != "":
             response = await data_processor.get_response(acc_id=row[-1])
             spend = await data_processor.get_spend_by_name(target_name=row[1],
@@ -34,6 +35,9 @@ async def main():
 async def links_migration():
     editor = GoogleSheetEditor()
     data = editor.get_all_sheet_data()
+    for row in data:
+        row[5] = 0
+        row[6] = 0
 
     next_day = datetime.datetime.today() + datetime.timedelta(days=1)
     new_name = next_day.strftime("%d/%m/%Y")
@@ -42,9 +46,9 @@ async def links_migration():
     editor.add_data(data=data, sheet=ws)
 
 
-async def start_sheduler():
-    await main()
-    # await links_migration()S
+async def start_scheduler():
+    # await main()
+    # await links_migration()
     scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
     scheduler.add_job(main, 'interval', minutes=30)
     scheduler.add_job(links_migration, "cron", hour=23, minute=59)

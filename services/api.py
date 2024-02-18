@@ -1,9 +1,11 @@
 import re
+from datetime import datetime
 from bs4 import BeautifulSoup
 import json
 import aiohttp
 import asyncio
 from aiohttp import ClientResponse
+import pytz
 from config import Config
 
 
@@ -12,14 +14,17 @@ class DataProcessor:
         self.token = Config().get_api_token()
         self.base_url = "https://fbtool.pro/api"
 
-    async def convert(spend: float, currency: str):
+    async def convert(self, spend: float, currency: str):
         async with aiohttp.ClientSession() as session:
             async with session.get(url=f"https://www.forbes.com/advisor/money-transfer/currency-converter/{currency.lower()}-usd/?amount={spend}") as response:
-                soup = BeautifulSoup(response.text, "html.parser")
+                soup = BeautifulSoup(await response.text(), "html.parser")
                 return soup.find("span", class_="amount")
 
     async def get_response(self, acc_id: int, retries: int = 3) -> ClientResponse:
-        url = f"{self.base_url}/get-statistics?key={self.token}&account={acc_id}&mode=adsets"
+        msk_timezone = pytz.timezone('Europe/Moscow')
+        current_time = datetime.now(msk_timezone)
+        formatted_time = current_time.strftime('%Y-%m-%d')
+        url = f"{self.base_url}/get-statistics?key={self.token}&account={acc_id}&mode=adsets&dates={formatted_time} - {formatted_time}"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 try:
@@ -35,7 +40,6 @@ class DataProcessor:
     async def get_spend_by_name(self, target_name: str, response) -> float:
         total_spend = 0
         data = response
-        print(data)
         for account in data.get("data", []):
             currency = account.get("currency")
             adsets_data = account.get("adsets", {}).get("data", [])

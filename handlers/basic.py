@@ -1,3 +1,5 @@
+import pytz
+from datetime import datetime
 from aiogram import F, Router, Bot
 from aiogram.types import Message, ChatMemberUpdated
 from keyboards.reply import main_keyboard
@@ -34,6 +36,8 @@ async def on_chat_member_join(chat_member: ChatMemberUpdated):
         return editor.update_mambers_count(link=invite_link.invite_link,
                                            number=1)
     is_sub = await db.check_user_by_id(user_id=user_id)
-    if is_sub:
-        await editor.update_mambers_count(link=is_sub, number=-1)
+    print(is_sub)
+    if is_sub is not None:
+        print(123)
+        editor.update_mambers_count(link=is_sub, number=-1)
         return await db.delete_user_by_id(user_id=user_id)

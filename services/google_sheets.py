@@ -1,12 +1,13 @@
 import datetime
 import gspread
+import pytz
 from gspread import Worksheet
 from typing import List
 from config import Config
 
 
 client = gspread.service_account(filename=Config().get_client_secret_path())
-sh = client.open_by_key("1yOfCoMLYIz-3Up2u5xMwuE01Qs8xdkEJ0iQJvwpFRH0")
+sh = client.open_by_key("1khPWyEr6c-F6igDrOHFj0VcUTPb9QSiloDLPCanhtFo")
 
 
 class GoogleSheetEditor():
@@ -17,7 +18,9 @@ class GoogleSheetEditor():
 
     def get_worksheet(self):
         ws = sh.get_worksheet(0)
-        date = datetime.datetime.today().strftime("%d/%m/%Y")
+        msk_timezone = pytz.timezone('Europe/Moscow')
+        msk_time = datetime.datetime.now(msk_timezone)
+        date = msk_time.strftime("%d/%m/%Y")
         if ws.title != date:
             try:
                 ws = self.create_new_sheet(name=date)
@@ -72,6 +75,10 @@ class GoogleSheetEditor():
             if current:
                 self.update_data(colm="G", number=cell.row,
                                 value=int(current[0][0])+number)
+                # spend = self.get_data_by_cell(cell=f"F{cell.row}")[0][0]
+                # print(spend)
+                # if spend != "Не найдено" and int(current[0][0])+number !=0:
+                #     self.update_data(colm="H", number=cell.row, value=round(float(spend)/(int(current[0][0])+number), 3))
 
     def get_all_sheet_data(self):
         wks = self.get_worksheet()

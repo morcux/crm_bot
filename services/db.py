@@ -1,5 +1,6 @@
+import pytz
 import aiosqlite
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 class AsyncDatabaseHandler:
@@ -11,7 +12,7 @@ class AsyncDatabaseHandler:
             cursor = await db.execute('''
                 CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    time TIMESTAMP DEFAULT (strftime('%Y-%m-%d %H:%M:%S', 'now', 'localtime', '+3 hours')),
                     user_id INTEGER,
                     url TEXT
                 )
@@ -26,6 +27,7 @@ class AsyncDatabaseHandler:
                 )
             ''')
             await cursor.close()
+
 
     async def add_user(self, user_id, url):
         async with aiosqlite.connect(self.db_name) as db:
@@ -43,11 +45,13 @@ class AsyncDatabaseHandler:
             user_info = await cursor.fetchone()
 
             if user_info:
-                print(user_info)
                 url, user_time = user_info
-                current_time = datetime.now()
-                delta = current_time - datetime.fromisoformat(user_time)
-                if delta < timedelta(days=1):
+                moscow_tz = pytz.timezone('Europe/Moscow')
+                current_time_msk = datetime.now(moscow_tz)
+                user_time = datetime.fromisoformat(user_time).astimezone(moscow_tz)
+
+                delta = current_time_msk.date() == user_time.date()
+                if delta:
                     return url
                 else:
                     return None
