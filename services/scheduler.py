@@ -28,8 +28,7 @@ async def main():
             editor.update_data(colm="K", number=row[0], value=account)
             editor.update_data("F", row[0], spend)
             break
-        if spend is None:
-            editor.update_data("F", row[0], "Не найдено")
+
             
     
 async def links_migration():
@@ -47,8 +46,6 @@ async def links_migration():
 
 
 async def start_scheduler():
-    # await main()
-    # await links_migration()
     scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
     scheduler.add_job(main, 'interval', minutes=30)
     scheduler.add_job(links_migration, "cron", hour=23, minute=59)

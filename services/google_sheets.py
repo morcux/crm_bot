@@ -59,13 +59,12 @@ class GoogleSheetEditor():
                 range_name=f"A{start_row}",
                 values=[
                     [start_row,
-                     names[i], "", "", "", "", 0, 0, links[i]]
+                     names[i], "", "", "", 0, 0, 0, links[i]]
                        ])
             start_row += 1
 
     def get_data_by_cell(self, cell: str):
         wks = self.get_worksheet()
-        # print(wks.get(cell))
         return wks.get(cell)
 
     def update_mambers_count(self, link: str, number: int):
@@ -75,10 +74,6 @@ class GoogleSheetEditor():
             if current:
                 self.update_data(colm="G", number=cell.row,
                                 value=int(current[0][0])+number)
-                # spend = self.get_data_by_cell(cell=f"F{cell.row}")[0][0]
-                # print(spend)
-                # if spend != "Не найдено" and int(current[0][0])+number !=0:
-                #     self.update_data(colm="H", number=cell.row, value=round(float(spend)/(int(current[0][0])+number), 3))
 
     def get_all_sheet_data(self):
         wks = self.get_worksheet()
