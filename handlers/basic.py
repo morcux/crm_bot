@@ -1,5 +1,4 @@
-import pytz
-from datetime import datetime
+import aiohttp
 from aiogram import F, Router, Bot
 from aiogram.types import Message, ChatMemberUpdated
 from keyboards.reply import main_keyboard
@@ -28,16 +27,17 @@ async def generate(message:  Message, bot: Bot):
 async def on_chat_member_join(chat_member: ChatMemberUpdated):
     user_id = chat_member.new_chat_member.user.id
     db = AsyncDatabaseHandler()
-    editor = GoogleSheetEditor()
     invite_link = chat_member.invite_link
-    if invite_link:
+    print(invite_link)
+    if invite_link is not None:
         await db.add_user(url=invite_link.invite_link,
                           user_id=user_id)
-        return editor.update_mambers_count(link=invite_link.invite_link,
-                                           number=1)
+        params = {"url": invite_link.invite_link, "number": 1}
+        async with aiohttp.ClientSession() as session:
+            return await session.get("http://127.0.0.1:8000/update_member_count", params=params)
     is_sub = await db.check_user_by_id(user_id=user_id)
-    print(is_sub)
     if is_sub is not None:
-        print(123)
-        editor.update_mambers_count(link=is_sub, number=-1)
-        return await db.delete_user_by_id(user_id=user_id)
+        await db.delete_user_by_id(user_id=user_id)
+        params = {"url": is_sub, "number": 1}
+        async with aiohttp.ClientSession() as session:
+            return await session.get("http://127.0.0.1:8000/update_member_count", params=params)

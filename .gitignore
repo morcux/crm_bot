@@ -6,3 +6,4 @@ tets.py
 
 database.db
 services/client_secret.json
+google_services/client_secret.json

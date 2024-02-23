@@ -20,7 +20,9 @@ class DataProcessor:
                 soup = BeautifulSoup(await response.text(), "html.parser")
                 return soup.find("span", class_="amount")
 
-    async def get_response(self, acc_id: int, retries: int = 3) -> ClientResponse:
+    async def get_response(self,
+                           acc_id: int,
+                           retries: int = 3) -> ClientResponse:
         msk_timezone = pytz.timezone('Europe/Moscow')
         current_time = datetime.now(msk_timezone)
         formatted_time = current_time.strftime('%Y-%m-%d')
@@ -30,11 +32,14 @@ class DataProcessor:
                 try:
                     data = json.loads(await response.text())
                 except json.decoder.JSONDecodeError:
+                    print(23981)
                     if retries > 0:
                         await asyncio.sleep(10)
-                        return await self.get_response(acc_id=acc_id, retries=retries-1)
+                        return await self.get_response(acc_id=acc_id,
+                                                       retries=retries-1)
                     else:
                         raise
+                print(data)
                 return data
 
     async def get_spend_by_name(self, target_name: str, response) -> float:
@@ -50,16 +55,20 @@ class DataProcessor:
                         spend = insights["data"][0]["spend"]
                         if currency != "USD":
                             spend = await self.convert(spend, currency)
-                            
+
                         total_spend += float(spend)
+                        print(spend)
         if total_spend > 0.0:
             return total_spend
         return None
 
     async def get_all_accounts(self) -> list:
         url = f"{self.base_url}/get-accounts?key={self.token}"
+        print(123)
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 data = json.loads(await response.text())
+                print(data)
                 ids = [item['id'] for item in data.values() if isinstance(item, dict) and 'id' in item]
+                print(ids)
                 return ids

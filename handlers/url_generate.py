@@ -1,9 +1,9 @@
+import aiohttp
 from aiogram import F, Router, Bot
 from aiogram.types import CallbackQuery, Message
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from states.channel import ChannelStates
-from services.google_sheets import GoogleSheetEditor
 
 url_router = Router()
 
@@ -20,7 +20,6 @@ async def get_names(call: CallbackQuery, state: FSMContext):
 @url_router.message(StateFilter(ChannelStates.get_names))
 async def add_data(message: Message, state: FSMContext, bot: Bot):
     data = await state.get_data()
-    editor = GoogleSheetEditor()
     links = []
     names = message.text.split("\n")
     for i in range(len(names)):
@@ -28,6 +27,8 @@ async def add_data(message: Message, state: FSMContext, bot: Bot):
                                                  name=f"{names[i]}",
                                                  creates_join_request=True)
         links.append(link.invite_link)
-    editor.add_links(links=links, names=names)
+    params = {'links': ','.join(links), 'names': ','.join(names)}
+    async with aiohttp.ClientSession() as session:
+        await session.get(url="http://127.0.0.1:8000/add_links", params=params)
     await message.answer(text="\n".join(links))
     await state.clear()

@@ -73,7 +73,7 @@ class GoogleSheetEditor():
             current = self.get_data_by_cell(cell=f"G{cell.row}")
             if current:
                 self.update_data(colm="G", number=cell.row,
-                                 value=int(current[0][0])+number)
+                                 value=int(current[0][0])+int(number))
 
     def get_all_sheet_data(self):
         wks = self.get_worksheet()
