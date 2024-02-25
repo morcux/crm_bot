@@ -6,8 +6,8 @@ from typing import List
 from config import Config
 
 
-client = gspread.service_account(filename=Config().get_client_secret_path())
-sh = client.open_by_key("1c63VemrYWl1ZLgkO5tpo0860qfKRxdTKMmoP3B7S8CU")
+client = gspread.service_account(filename="client_secret.json")
+sh = client.open_by_key("1khPWyEr6c-F6igDrOHFj0VcUTPb9QSiloDLPCanhtFo")
 
 
 class GoogleSheetEditor():
@@ -72,6 +72,8 @@ class GoogleSheetEditor():
         if cell:
             current = self.get_data_by_cell(cell=f"G{cell.row}")
             if current:
+                if int(current[0][0]) + int(number) < 0:
+                    pass
                 self.update_data(colm="G", number=cell.row,
                                  value=int(current[0][0])+int(number))
 

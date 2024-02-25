@@ -1,3 +1,4 @@
+import datetime
 from fastapi import FastAPI, Query
 from fastapi.responses import JSONResponse
 from google_sheets import GoogleSheetEditor
@@ -59,3 +60,18 @@ async def spend():
                 editor.update_data("K", row[0], acc)
                 editor.update_data("F", row[0], spend)
                 break
+
+
+@app.get("/link_migration")
+async def migrate():
+    editor = GoogleSheetEditor()
+    data = editor.get_all_sheet_data()
+    for row in data:
+        row[5] = 0
+        row[6] = 0
+
+    next_day = datetime.datetime.today() + datetime.timedelta(days=1)
+    new_name = next_day.strftime("%d/%m/%Y")
+
+    ws = editor.create_new_sheet(name=new_name)
+    editor.add_data(data=data, sheet=ws)
