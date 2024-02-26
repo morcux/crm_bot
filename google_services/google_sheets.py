@@ -3,8 +3,6 @@ import gspread
 import pytz
 from gspread import Worksheet
 from typing import List
-from config import Config
-
 
 client = gspread.service_account(filename="client_secret.json")
 sh = client.open_by_key("1khPWyEr6c-F6igDrOHFj0VcUTPb9QSiloDLPCanhtFo")

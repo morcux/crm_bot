@@ -5,8 +5,14 @@ import json
 import aiohttp
 import asyncio
 from aiohttp import ClientResponse
+from pydantic import BaseModel
 import pytz
 from config import Config
+
+
+class Account(BaseModel):
+    name: str
+    acc_id: str
 
 
 class DataProcessor:
@@ -69,6 +75,6 @@ class DataProcessor:
             async with session.get(url) as response:
                 data = json.loads(await response.text())
                 print(data)
-                ids = [item['id'] for item in data.values() if isinstance(item, dict) and 'id' in item]
+                ids = [Account(name=item["name"], acc_id=item["id"]) for item in data.values() if isinstance(item, dict) and "id" in item]
                 print(ids)
                 return ids

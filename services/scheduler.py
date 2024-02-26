@@ -1,5 +1,4 @@
 import aiohttp
-import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
@@ -14,7 +13,7 @@ async def links_migration():
 
 
 async def start_scheduler():
-    # await links_migration()
+    await main()
     scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
     scheduler.add_job(main, 'interval', minutes=30)
     scheduler.add_job(links_migration, "cron", hour=23, minute=59)

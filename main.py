@@ -13,6 +13,7 @@ async def main():
     await db.create_tables()
     await start_scheduler()
     bot = Bot(token=Config().get_bot_token())
+    await bot.delete_webhook()
     dp = Dispatcher()
     dp.include_router(basic_router)
     dp.include_router(channel_router)

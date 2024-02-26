@@ -33,33 +33,24 @@ async def spend():
     data_processor = DataProcessor()
     accounts = await data_processor.get_all_accounts()
     data = editor.get_all_sheet_data()
-    rows = [[row[0], row[1], row[-3], row[-1]] if len(row) == 11 else [row[0], row[1], row[-3], ""] for row in data]
+    rows = [[row[0], row[1], row[-3]] if len(row) == 11 else [row[0], row[1], row[-3]] for row in data]
     for row in rows:
         if row[1] == "":
             print("NAME IS EMPTY")
             continue
-        elif row[-1] != "":
-            print("ID ALREADY EXIST")
-            acc = row[-1]
-            acc = accounts.get(acc)
-            response = await data_processor.get_response(acc_id=acc)
-            spend = await data_processor.get_spend_by_name(target_name=row[1],
-                                                           response=response)
-            editor.update_data("F", row[0], spend)
-            continue
         else:
             print("SEARCH ACC")
-            print(accounts)
             for acc in accounts:
-                print(acc)
-                response = await data_processor.get_response(acc_id=acc)
-                spend = await data_processor.get_spend_by_name(
-                    target_name=row[1], response=response)
-                if spend is None:
-                    continue
-                editor.update_data("K", row[0], acc)
-                editor.update_data("F", row[0], spend)
-                break
+                print(acc.name)
+                if row[1].split()[0] in acc.name:
+                    response = await data_processor.get_response(acc_id=acc)
+                    spend = await data_processor.get_spend_by_name(
+                        target_name=row[1], response=response)
+                    if spend is None:
+                        continue
+                    editor.update_data("F", row[0], spend)
+                    break
+            
 
 
 @app.get("/link_migration")
