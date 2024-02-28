@@ -38,6 +38,6 @@ async def on_chat_member_join(chat_member: ChatMemberUpdated):
     is_sub = await db.check_user_by_id(user_id=user_id)
     if is_sub is not None:
         await db.delete_user_by_id(user_id=user_id)
-        params = {"url": is_sub, "number": 1}
+        params = {"url": is_sub, "number": -1}
         async with aiohttp.ClientSession() as session:
             return await session.get("http://127.0.0.1:8000/update_member_count", params=params)
