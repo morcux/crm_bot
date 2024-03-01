@@ -83,3 +83,9 @@ class AsyncDatabaseHandler:
 
     async def close_connection(self):
         pass
+    
+
+    async def delete_all_users(self):
+        async with aiosqlite.connect(self.db_name) as db:
+            await db.execute('DELETE FROM users')
+            await db.commit()

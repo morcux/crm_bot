@@ -71,7 +71,7 @@ class GoogleSheetEditor():
             current = self.get_data_by_cell(cell=f"G{cell.row}")
             if current:
                 if int(current[0][0]) + int(number) < 0:
-                    pass
+                    return
                 self.update_data(colm="G", number=cell.row,
                                  value=int(current[0][0])+int(number))
 

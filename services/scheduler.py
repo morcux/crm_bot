@@ -1,6 +1,6 @@
 import aiohttp
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
+from services.db import AsyncDatabaseHandler
 
 async def main():
     async with aiohttp.ClientSession() as session:
@@ -8,8 +8,11 @@ async def main():
 
 
 async def links_migration():
+    db = AsyncDatabaseHandler()
+    await db.delete_all_users()
     async with aiohttp.ClientSession() as session:
         await session.get("http://127.0.0.1:8000/link_migration")
+
 
 
 async def start_scheduler():

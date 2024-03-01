@@ -4,7 +4,6 @@ from aiogram.types import Message, ChatMemberUpdated
 from keyboards.reply import main_keyboard
 from keyboards.inline import generate_channels_keyboard
 from services.db import AsyncDatabaseHandler
-from services.google_sheets import GoogleSheetEditor
 
 basic_router = Router()
 
