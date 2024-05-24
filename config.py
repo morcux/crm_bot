@@ -8,6 +8,7 @@ class Config:
 
     def __init__(self) -> None:
         self.__BOT_TOKEN = os.getenv("BOT_TOKEN", default="")
+        self.__INFO_BOT_TOKEN = os.getenv("INFO_BOT_TOKEN", default="")
         self.__CLIENT_SECRET_PATH = os.getenv("CLIENT_SECRET_PATH", default="")
         self.__API_TOKEN = os.getenv("API_TOKEN", default="")
         self.__CHANNEL_ID = os.getenv("CHANNEL_ID", default=123)
@@ -23,3 +24,6 @@ class Config:
 
     def get_channel_id(self):
         return self.__CHANNEL_ID
+
+    def get_info_bot_token(self):
+        return self.__INFO_BOT_TOKEN
