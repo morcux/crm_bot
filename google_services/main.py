@@ -14,6 +14,7 @@ async def root():
 
 @app.get("/update_member_count")
 async def update_mebmer_count(url: str, number: str):
+    print(url)
     editor = GoogleSheetEditor()
     editor.update_mambers_count(link=url, number=number)
     return {"success": True}
@@ -33,7 +34,7 @@ async def spend():
     data_processor = DataProcessor()
     accounts = await data_processor.get_all_accounts()
     data = editor.get_all_sheet_data()
-    rows = [[row[0], row[1], row[-3]] if len(row) == 11 else [row[0], row[1], row[-3]] for row in data]
+    rows = [[row[0], row[1]] for row in data]
     for row in rows:
         if row[1] == "":
             print("NAME IS EMPTY")
@@ -43,7 +44,7 @@ async def spend():
             for acc in accounts:
                 print(acc.name)
                 if row[1].split()[0] in acc.name:
-                    response = await data_processor.get_response(acc_id=acc)
+                    response = await data_processor.get_response(acc_id=acc.acc_id)
                     spend = await data_processor.get_spend_by_name(
                         target_name=row[1], response=response)
                     if spend is None:
