@@ -7,14 +7,14 @@ from services.db import AsyncDatabaseHandler
 from keyboards.inline import generate_channels_keyboard
 from keyboards.reply import admin_menu, search_keyboard
 
-ADMIN_ID = 123123
+ADMIN_ID = [6426165426, 5198857407]
 
 search_router = Router()
 
 @search_router.message(F.text == "/start")
 async def start(message: Message, state: FSMContext):
     await state.clear()
-    if message.from_user.id == ADMIN_ID:
+    if message.from_user.id in ADMIN_ID:
         keyboard = admin_menu
     else:
         keyboard = search_keyboard
@@ -76,6 +76,11 @@ async def search_user(message: Message):
     db = AsyncDatabaseHandler()
     channels = await db.get_user_channels(user_id=message.from_user.id)
     print(channels)
+    if message.from_user.id in ADMIN_ID:
+        channels = await db.get_all_channels()
+        keyboard = generate_channels_keyboard(channels, prefix="search")
+        await message.answer("Выберите канал, в котором искать", reply_markup=keyboard)
+        return
     if not channels:
         await message.answer("У вас нет доступа ни к одному каналу.")
         return
@@ -96,8 +101,10 @@ async def get_id(call: CallbackQuery, state: FSMContext):
 async def get_info(message: Message, state: FSMContext):
     db = AsyncDatabaseHandler()
     data = await state.get_data()
-    
-    user_id = message.text
+    if message.forward_from:
+        user_id = message.forward_from.id
+    else:
+        user_id = message.text
     channel_id = data["channel_id"]
     print(user_id, channel_id)
     subscriptions = await db.get_subscriptions(user_id=user_id, channel_id=channel_id)

@@ -13,6 +13,9 @@ admin_menu = ReplyKeyboardMarkup(keyboard=[
     [
         KeyboardButton(text="Добавить менеджера"),
         KeyboardButton(text="Удалить менеджера")
+    ],
+    [
+        KeyboardButton(text="Поиск")
     ]
 ], resize_keyboard=True)
 
