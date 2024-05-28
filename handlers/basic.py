@@ -3,6 +3,7 @@ from aiogram import F, Router, Bot
 from aiogram.types import Message, ChatMemberUpdated
 from keyboards.reply import main_keyboard
 from keyboards.inline import generate_channels_keyboard
+from services.fb import send_facebook_event
 from services.db import AsyncDatabaseHandler
 
 basic_router = Router()
@@ -26,6 +27,8 @@ async def on_chat_member_join(chat_member: ChatMemberUpdated):
     user_id = chat_member.new_chat_member.user.id
     db = AsyncDatabaseHandler()
     invite_link = chat_member.invite_link
+    if chat_member.chat.id == "-1002106220236":
+        await send_facebook_event("Subscribe", user_id)
     if invite_link is not None:
         await db.add_subscription(user_id=user_id,
                                   url_name=invite_link.name,
