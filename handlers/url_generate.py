@@ -74,3 +74,25 @@ async def delete_url(call: CallbackQuery, state: FSMContext, bot: Bot):
                                     expire_date=datetime.now())
     await call.message.answer("Ссылка была деактивирована")
     await call.message.delete()
+
+
+@url_router.message(F.text == "Показать ссылки")
+async def channel(message: Message):
+    db = AsyncDatabaseHandler()
+    channels = await db.get_user_url(user_id=message.from_user.id)
+    if not channels:
+        return await message.answer("У вас нету доступа ни к одному каналу")
+    keyboard = generate_channels_keyboard(channels, prefix="show")
+    await message.answer(text="Выберите канал", reply_markup=keyboard)
+
+
+@url_router.message(F.data.startswith("show"))
+async def show_urls(call: CallbackQuery):
+    db = AsyncDatabaseHandler()
+    channel_id = int(call.data.split("_")[-1])
+    urls = await db.get_all_urls(channel_id=channel_id)
+    text = ""
+    for url in urls:
+        text += f"{url[-1]}\n"
+    await call.answer()
+    await call.message.answer(text=text)
