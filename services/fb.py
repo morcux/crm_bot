@@ -29,7 +29,8 @@ async def send_facebook_event(event_name: str, user_id: int):
             if response.status == 200:
                 logging.info('Event sent to Facebook Pixel successfully')
             else:
-                logging.error('Failed to send event to Facebook Pixel', response.json())
+                logging.error('Failed to send event to Facebook Pixel',
+                              response.json())
 
 if __name__ == "__main__":
     asyncio.run(send_facebook_event("Subscribe", 123123123))

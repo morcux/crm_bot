@@ -43,8 +43,24 @@ class AsyncDatabaseHandler:
                     channel_id INTEGER
                 )
             ''')
-            await db.commit()
 
+            await db.execute('''
+                CREATE TABLE IF NOT EXISTS permission_url (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER,
+                    channel_id INTEGER
+                )
+            ''')
+
+            await db.execute('''
+                CREATE TABLE IF NOT EXISTS urls (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    channel_id INTEGER,
+                    url TEXT
+                )
+            ''')
+
+            await db.commit()
 
     async def add_user(self, user_id, url):
         async with aiosqlite.connect(self.db_name) as db:
@@ -101,7 +117,7 @@ class AsyncDatabaseHandler:
             await db.execute('DELETE FROM users')
             await db.commit()
 
-    # New Methods for Subscriptions and Permissions
+    # Methods for Subscriptions and Permissions
 
     async def add_subscription(self, user_id, url_name, channel_id):
         moscow_tz = pytz.timezone('Europe/Moscow')
@@ -112,7 +128,6 @@ class AsyncDatabaseHandler:
                 INSERT INTO subscriptions (user_id, url_name, channel_id, timestamp) VALUES (?, ?, ?, ?)
             ''', (user_id, url_name, channel_id, current_time_msk))
             await db.commit()
-
 
     async def get_subscriptions(self, user_id, channel_id=None):
         async with aiosqlite.connect(self.db_name) as db:
@@ -126,7 +141,6 @@ class AsyncDatabaseHandler:
                 ''', (user_id,))
             subscriptions = await cursor.fetchall()
             return subscriptions
-
 
     async def delete_subscription(self, user_id, channel_id):
         async with aiosqlite.connect(self.db_name) as db:
@@ -161,9 +175,75 @@ class AsyncDatabaseHandler:
         async with aiosqlite.connect(self.db_name) as db:
             cursor = await db.execute('''
                 SELECT channels.channel_id, channels.channel_name 
-                FROM channels
+                FROM channels 
                 INNER JOIN permissions ON channels.channel_id = permissions.channel_id
                 WHERE permissions.user_id = ?
             ''', (user_id,))
             channels = await cursor.fetchall()
             return channels
+
+    # Methods for permission_url
+
+    async def add_permission_url(self, user_id, channel_id):
+        async with aiosqlite.connect(self.db_name) as db:
+            await db.execute('''
+                INSERT INTO permission_url (user_id, channel_id) VALUES (?, ?)
+            ''', (user_id, channel_id))
+            await db.commit()
+
+    async def get_permission_urls(self, user_id):
+        async with aiosqlite.connect(self.db_name) as db:
+            cursor = await db.execute('''
+                SELECT * FROM permission_url WHERE user_id = ?
+            ''', (user_id,))
+            permissions = await cursor.fetchall()
+            return permissions
+
+    async def delete_permission_url(self, user_id, channel_id):
+        async with aiosqlite.connect(self.db_name) as db:
+            await db.execute('''
+                DELETE FROM permission_url WHERE user_id = ? AND channel_id = ?
+            ''', (user_id, channel_id))
+            await db.commit()
+
+    async def delete_channel_by_id(self, channel_id):
+        async with aiosqlite.connect(self.db_name) as db:
+            await db.execute('''
+                DELETE FROM channels WHERE channel_id = ?
+            ''', (channel_id,))
+            await db.commit()
+
+    async def get_user_url(self, user_id):
+        async with aiosqlite.connect(self.db_name) as db:
+            cursor = await db.execute('''
+                SELECT channels.channel_id, channels.channel_name 
+                FROM channels 
+                INNER JOIN permission_url ON channels.channel_id = permission_url.channel_id
+                WHERE permission_url.user_id = ?
+            ''', (user_id,))
+            channels = await cursor.fetchall()
+            return channels
+
+    # Methods for URLs table
+
+    async def add_url(self, channel_id, url):
+        async with aiosqlite.connect(self.db_name) as db:
+            await db.execute('''
+                INSERT INTO urls (channel_id, url) VALUES (?, ?)
+            ''', (channel_id, url))
+            await db.commit()
+
+    async def delete_url(self, url):
+        async with aiosqlite.connect(self.db_name) as db:
+            await db.execute('''
+                DELETE FROM urls WHERE url = ?
+            ''', (url,))
+            await db.commit()
+
+    async def get_all_urls(self, channel_id):
+        async with aiosqlite.connect(self.db_name) as db:
+            cursor = await db.execute('''
+                SELECT * FROM urls WHERE channel_id = ?
+            ''', (channel_id,))
+            urls = await cursor.fetchall()
+            return urls
