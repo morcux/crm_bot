@@ -38,7 +38,7 @@ async def on_chat_member_join(chat_member: ChatMemberUpdated):
     user_id = chat_member.new_chat_member.user.id
     db = AsyncDatabaseHandler()
     invite_link = chat_member.invite_link
-    if chat_member.chat.id == "-1002106220236":
+    if chat_member.chat.id == -1002106220236:
         await send_facebook_event("Subscribe", user_id)
     if invite_link is not None:
         await db.add_subscription(user_id=user_id,
