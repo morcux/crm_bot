@@ -10,6 +10,8 @@ from keyboards.inline import generate_channels_keyboard, generate_url_keyboard
 
 url_router = Router()
 
+ADMIN_ID = [6426165426, 5198857407]
+
 
 @url_router.callback_query(F.data.startswith("channel"))
 async def get_names(call: CallbackQuery, state: FSMContext):
@@ -44,6 +46,8 @@ async def add_data(message: Message, state: FSMContext, bot: Bot):
 async def get_url_channel(message: Message):
     db = AsyncDatabaseHandler()
     channels = await db.get_user_url(user_id=message.from_user.id)
+    if message.from_user.id in ADMIN_ID:
+        channels = await db.get_all_channels()
     if not channels:
         return await message.answer("У вас нету доступа ни к одному каналу")
     keyboard = generate_channels_keyboard(channels, prefix="c_url")
