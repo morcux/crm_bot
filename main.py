@@ -7,6 +7,7 @@ from handlers.url_generate import url_router
 from handlers.search import search_router
 from handlers.url_permission import permission_router
 from services.scheduler import start_scheduler
+from services.google_sheets import GoogleSheetEditor
 from services.db import AsyncDatabaseHandler
 from config import Config
 
@@ -16,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 async def main():
     db = AsyncDatabaseHandler()
     await db.create_tables()
-    # await start_scheduler()
+    await start_scheduler()
     bot = Bot(token=Config().get_bot_token())
     info_bot = Bot(token=Config().get_info_bot_token())
     dp = Dispatcher()

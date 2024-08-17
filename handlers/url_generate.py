@@ -10,7 +10,7 @@ from keyboards.inline import generate_channels_keyboard, generate_url_keyboard
 
 url_router = Router()
 
-ADMIN_ID = [6426165426, 5198857407]
+ADMIN_ID = [6426165426, 5198857407, 7109898533, 6770144323]
 
 
 @url_router.callback_query(F.data.startswith("channel"))

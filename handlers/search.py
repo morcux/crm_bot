@@ -7,7 +7,7 @@ from services.db import AsyncDatabaseHandler
 from keyboards.inline import generate_channels_keyboard
 from keyboards.reply import admin_menu, search_keyboard
 
-ADMIN_ID = [6426165426, 5198857407]
+ADMIN_ID = [6426165426, 5198857407, 7109898533, 6770144323]
 
 search_router = Router()
 
