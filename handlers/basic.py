@@ -8,7 +8,7 @@ from services.db import AsyncDatabaseHandler
 
 basic_router = Router()
 
-ADMIN_ID = [7544120155, 5198857407, 7109898533, 6770144323]
+ADMIN_ID = [7544120155, 5198857407, 7109898533, 6770144323, 7107711151, 6486787455]
 
 
 @basic_router.message(F.text == "/start")
